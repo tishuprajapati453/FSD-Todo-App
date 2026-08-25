@@ -1,6 +1,6 @@
 import TaskItem from './TaskItem';
 
-function TaskList({ todos, onToggle, onDelete }) {
+function TaskList({ todos, onToggle, onDelete, onEdit }) {
   return (
     <ul style={{ listStyle: 'none', padding: 0 }}>
       {todos.length === 0 && <p>No tasks yet. Add one!</p>}
@@ -10,6 +10,7 @@ function TaskList({ todos, onToggle, onDelete }) {
           todo={todo}
           onToggle={onToggle}
           onDelete={onDelete}
+          onEdit={onEdit}
         />
       ))}
     </ul>

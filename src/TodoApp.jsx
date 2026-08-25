@@ -26,11 +26,24 @@ function TodoApp() {
     setTodos(todos.filter((todo) => todo.id !== id));
   };
 
+  const editTask = (id, newText) => {
+    setTodos(
+      todos.map((todo) =>
+        todo.id === id ? { ...todo, text: newText } : todo
+      )
+    );
+  };
+
   return (
     <div style={{ maxWidth: '500px', margin: '50px auto', fontFamily: 'Arial' }}>
       <h1>My Todo List</h1>
       <TaskForm onAddTask={addTask} />
-      <TaskList todos={todos} onToggle={toggleComplete} onDelete={deleteTask} />
+      <TaskList
+        todos={todos}
+        onToggle={toggleComplete}
+        onDelete={deleteTask}
+        onEdit={editTask}
+      />
     </div>
   );
 }
