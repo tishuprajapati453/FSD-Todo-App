@@ -1,9 +1,26 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import TaskForm from './TaskForm';
 import TaskList from './TaskList';
 
 function TodoApp() {
   const [todos, setTodos] = useState([]);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  // Component load thay tyare localStorage mathi data lavo
+  useEffect(() => {
+    const savedTodos = localStorage.getItem('todos');
+    if (savedTodos) {
+      setTodos(JSON.parse(savedTodos));
+    }
+    setIsLoaded(true);
+  }, []);
+
+  // Jyare pan todos change thay, localStorage ma save karo (pan fakt load thai gaya pachi j)
+  useEffect(() => {
+    if (isLoaded) {
+      localStorage.setItem('todos', JSON.stringify(todos));
+    }
+  }, [todos, isLoaded]);
 
   const addTask = (taskText) => {
     const newTodo = {
