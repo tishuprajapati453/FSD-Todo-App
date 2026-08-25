@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-function TaskForm({ onAddTask }) {
+function TaskForm({ onAddTask, inputRef }) {
   const [task, setTask] = useState('');
 
   const handleAdd = () => {
@@ -15,6 +15,7 @@ function TaskForm({ onAddTask }) {
   return (
     <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
       <input
+        ref={inputRef}
         type="text"
         placeholder="Enter a task"
         value={task}
