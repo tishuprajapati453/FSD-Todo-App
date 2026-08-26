@@ -3,6 +3,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import TaskForm from './TaskForm';
 import TaskList from './TaskList';
 import { useTheme } from './ThemeContext';
+import Quote from './Quote';
 
 function TodoApp() {
   const [todos, setTodos] = useState([]);
@@ -73,6 +74,7 @@ function TodoApp() {
       }}
     >
       <h1>My Todo List</h1>
+      <Quote />
       <p>
         Total tasks: {todos.length} | Completed: {completedCount}
       </p>
