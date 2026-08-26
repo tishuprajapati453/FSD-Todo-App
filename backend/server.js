@@ -1,13 +1,23 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const app = express();
 
 app.use(express.json());
 
-// Sample todos data (abhi mate hardcoded, Week 9-10 ma MongoDB thi aavse)
-let todos = [
-  { id: 1, text: 'Learn Express.js', completed: false },
-  { id: 2, text: 'Build REST API', completed: false },
-];
+// MongoDB Connection
+const MONGO_URI = 'mongodb://todoadmin:todo12345@ac-kohtsby-shard-00-00.nxljkhd.mongodb.net:27017,ac-kohtsby-shard-00-01.nxljkhd.mongodb.net:27017,ac-kohtsby-shard-00-02.nxljkhd.mongodb.net:27017/?ssl=true&replicaSet=atlas-av150p-shard-0&authSource=admin&appName=Cluster0'
+
+mongoose.connect(MONGO_URI)
+  .then(() => console.log('MongoDB Connected Successfully!'))
+  .catch((err) => console.log('MongoDB Connection Error:', err));
+
+// Todo Schema
+const todoSchema = new mongoose.Schema({
+  text: { type: String, required: true },
+  completed: { type: Boolean, default: false },
+});
+
+const Todo = mongoose.model('Todo', todoSchema);
 
 // Home route
 app.get('/', (req, res) => {
@@ -15,17 +25,16 @@ app.get('/', (req, res) => {
 });
 
 // Get all todos
-app.get('/api/todos', (req, res) => {
+app.get('/api/todos', async (req, res) => {
+  const todos = await Todo.find();
   res.json(todos);
 });
 
-// Get a single todo by id
-app.get('/api/todos/:id', (req, res) => {
-  const todo = todos.find((t) => t.id === parseInt(req.params.id));
-  if (!todo) {
-    return res.status(404).json({ message: 'Todo not found' });
-  }
-  res.json(todo);
+// Create a new todo
+app.post('/api/todos', async (req, res) => {
+  const newTodo = new Todo({ text: req.body.text });
+  await newTodo.save();
+  res.json(newTodo);
 });
 
 const PORT = 5000;
