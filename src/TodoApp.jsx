@@ -1,16 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import axios from 'axios';
 import TaskForm from './TaskForm';
 import TaskList from './TaskList';
+import { useTheme } from './ThemeContext';
 
 const API_URL = 'https://fsd-todo-app-production.up.railway.app/api/todos';
 
 function TodoApp() {
   const [todos, setTodos] = useState([]);
+  const inputRef = useRef(null);
+  const { darkMode } = useTheme();
 
-  // Fetch todos from backend on page load
   useEffect(() => {
     fetchTodos();
+    inputRef.current?.focus();
   }, []);
 
   const fetchTodos = async () => {
@@ -18,34 +21,8 @@ function TodoApp() {
     setTodos(res.data);
   };
 
+  const completedCount = useMemo(() => {
+    return todos.filter((todo) => todo.completed).length;
+  }, [todos]);
+
   const addTask = async (taskText) => {
-    const res = await axios.post(API_URL, { text: taskText });
-    setTodos([...todos, res.data]);
-  };
-
-  const toggleComplete = async (id) => {
-    const todo = todos.find((t) => t._id === id);
-    const res = await axios.put(`${API_URL}/${id}`, { completed: !todo.completed });
-    setTodos(todos.map((t) => (t._id === id ? res.data : t)));
-  };
-
-  const deleteTask = async (id) => {
-    await axios.delete(`${API_URL}/${id}`);
-    setTodos(todos.filter((t) => t._id !== id));
-  };
-
-  const editTask = async (id, newText) => {
-    const res = await axios.put(`${API_URL}/${id}`, { text: newText });
-    setTodos(todos.map((t) => (t._id === id ? res.data : t)));
-  };
-
-  return (
-    <div style={{ maxWidth: '500px', margin: '50px auto', fontFamily: 'Arial' }}>
-      <h1>My Todo List</h1>
-      <TaskForm onAddTask={addTask} />
-      <TaskList todos={todos} onToggle={toggleComplete} onDelete={deleteTask} onEdit={editTask} />
-    </div>
-  );
-}
-
-export default TodoApp;

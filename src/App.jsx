@@ -3,6 +3,7 @@ import { ThemeProvider } from './ThemeContext';
 import Navbar from './Navbar';
 import Home from './Home';
 import About from './About';
+import './App.css';
 
 function App() {
   return (

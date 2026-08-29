@@ -13,18 +13,15 @@ function TaskForm({ onAddTask, inputRef }) {
   };
 
   return (
-    <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+    <div className="task-form">
       <input
         ref={inputRef}
         type="text"
         placeholder="Enter a task"
         value={task}
         onChange={(e) => setTask(e.target.value)}
-        style={{ flex: 1, padding: '8px' }}
       />
-      <button onClick={handleAdd} style={{ padding: '8px 16px' }}>
-        Add
-      </button>
+      <button onClick={handleAdd}>Add</button>
     </div>
   );
 }
