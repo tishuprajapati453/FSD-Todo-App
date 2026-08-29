@@ -1,90 +1,49 @@
-
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 import TaskForm from './TaskForm';
 import TaskList from './TaskList';
-import { useTheme } from './ThemeContext';
-import Quote from './Quote';
+
+const API_URL = 'http://localhost:5000/api/todos';
 
 function TodoApp() {
   const [todos, setTodos] = useState([]);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const inputRef = useRef(null);
-  const { darkMode } = useTheme();
 
+  // Fetch todos from backend on page load
   useEffect(() => {
-    const savedTodos = localStorage.getItem('todos');
-    if (savedTodos) {
-      setTodos(JSON.parse(savedTodos));
-    }
-    setIsLoaded(true);
-    // Page load thay tyare input par automatically focus karo
-    inputRef.current?.focus();
+    fetchTodos();
   }, []);
 
-  useEffect(() => {
-    if (isLoaded) {
-      localStorage.setItem('todos', JSON.stringify(todos));
-    }
-  }, [todos, isLoaded]);
-
-  // useMemo - completed tasks no count, fakt todos change thay tyare j recalculate thay
-  const completedCount = useMemo(() => {
-    return todos.filter((todo) => todo.completed).length;
-  }, [todos]);
-
-  const addTask = (taskText) => {
-    const newTodo = {
-      id: Date.now(),
-      text: taskText,
-      completed: false,
-    };
-    setTodos([...todos, newTodo]);
+  const fetchTodos = async () => {
+    const res = await axios.get(API_URL);
+    setTodos(res.data);
   };
 
-  const toggleComplete = (id) => {
-    setTodos(
-      todos.map((todo) =>
-        todo.id === id ? { ...todo, completed: !todo.completed } : todo
-      )
-    );
+  const addTask = async (taskText) => {
+    const res = await axios.post(API_URL, { text: taskText });
+    setTodos([...todos, res.data]);
   };
 
-  const deleteTask = (id) => {
-    setTodos(todos.filter((todo) => todo.id !== id));
+  const toggleComplete = async (id) => {
+    const todo = todos.find((t) => t._id === id);
+    const res = await axios.put(`${API_URL}/${id}`, { completed: !todo.completed });
+    setTodos(todos.map((t) => (t._id === id ? res.data : t)));
   };
 
-  const editTask = (id, newText) => {
-    setTodos(
-      todos.map((todo) =>
-        todo.id === id ? { ...todo, text: newText } : todo
-      )
-    );
+  const deleteTask = async (id) => {
+    await axios.delete(`${API_URL}/${id}`);
+    setTodos(todos.filter((t) => t._id !== id));
+  };
+
+  const editTask = async (id, newText) => {
+    const res = await axios.put(`${API_URL}/${id}`, { text: newText });
+    setTodos(todos.map((t) => (t._id === id ? res.data : t)));
   };
 
   return (
-    <div
-      style={{
-        maxWidth: '500px',
-        margin: '50px auto',
-        fontFamily: 'Arial',
-        backgroundColor: darkMode ? '#222' : '#fff',
-        color: darkMode ? '#fff' : '#000',
-        padding: '20px',
-        borderRadius: '8px',
-      }}
-    >
+    <div style={{ maxWidth: '500px', margin: '50px auto', fontFamily: 'Arial' }}>
       <h1>My Todo List</h1>
-      <Quote />
-      <p>
-        Total tasks: {todos.length} | Completed: {completedCount}
-      </p>
-      <TaskForm onAddTask={addTask} inputRef={inputRef} />
-      <TaskList
-        todos={todos}
-        onToggle={toggleComplete}
-        onDelete={deleteTask}
-        onEdit={editTask}
-      />
+      <TaskForm onAddTask={addTask} />
+      <TaskList todos={todos} onToggle={toggleComplete} onDelete={deleteTask} onEdit={editTask} />
     </div>
   );
 }
