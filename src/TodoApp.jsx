@@ -3,7 +3,7 @@ import axios from 'axios';
 import TaskForm from './TaskForm';
 import TaskList from './TaskList';
 
-const API_URL = 'http://localhost:5000/api/todos';
+const API_URL = 'https://fsd-todo-app-production.up.railway.app/api/todos';
 
 function TodoApp() {
   const [todos, setTodos] = useState([]);
